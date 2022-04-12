@@ -13,7 +13,10 @@ import java.util.stream.Stream;
  */
 //https://blog.csdn.net/weixin_36133625/article/details/116903121
 //https://blog.csdn.net/weixin_39407066/article/details/88805123
+//https://blog.csdn.net/mu_wind/article/details/109516995
 /**
+ * Lambda表达式的语法:
+ * ”基本语法: (parameters) -> expression 或 (parameters) ->{ statements; }
  * 中间操作常用方法有：筛选：filter 映射：map 排序：sorted提取与组合 收集：collect。
  * 终止操作：遍历：foreach 匹配：find、match 规约：reduce 聚合：max、min、count
  */
@@ -21,10 +24,11 @@ public class LambdaTest {
 
     public List<Student> initData(){
         List<Student> list=new ArrayList();
-        list.add(new Student("赵丽颖", 52, 95));
-        list.add(new Student("杨颖", 56, 88));
-        list.add(new Student("迪丽热巴", 56, 55));
-        list.add(new Student("柳岩", 52, 33));
+        list.add(new Student("赵丽颖", 28, 95));
+        list.add(new Student("赵丽颖", 28, 95));
+        list.add(new Student("杨颖", 26, 88));
+        list.add(new Student("迪丽热巴", 25, 55));
+        list.add(new Student("柳岩", 38, 33));
         return list;
     }
 
@@ -38,14 +42,18 @@ public class LambdaTest {
         //获取串行流
         Stream stream = collection.stream();
         //获取并行流
-        Stream stream1 = collection.parallelStream();
+        Stream pStream = collection.parallelStream();
         //方式2：通过Arrays中的Stream方法  数组
-        IntStream stream2 = Arrays.stream(new int[]{1, 2, 3, 4, 5});
+        IntStream intStream = Arrays.stream(new int[]{1, 2, 3, 4, 5});
         //方式3：Stream中的of方法
-        Stream<String> stream3 = Stream.of("111", "222", "333");
+        Stream<String> ofStream = Stream.of("111", "222", "333");
         //方法4：Stream中的方法  创建无限流  （结果是无线个）
         Stream<Integer> iterate = Stream.iterate(2, (x) -> x + 2);
         System.out.println(stream);
+        System.out.println(pStream);
+        System.out.println(intStream);
+        System.out.println(ofStream);
+        System.out.println(iterate);
     }
 
     /**
@@ -58,11 +66,15 @@ public class LambdaTest {
         //1：创建Stream;
         Stream<Student> stream = list.stream();
         //2：filter方法（找到年龄大于等于18岁的学生）
-        Stream<Student> studentStream = stream.filter((student) -> student.getAge() >= 18);
+        //Stream<Student> studentStream = stream.filter((student) -> student.getAge() >= 18);
         //3：终止操作;如果没有终止操作的话，上面的第二步中间操作不执行
-        studentStream.forEach(System.out::println);
+        //studentStream.forEach(System.out::println);
+        List<Student> students = stream.filter(s -> {
+            return s.getAge() > 50;
+        }).collect(Collectors.toList());
+        System.out.println("students:"+students);
         /**
-         * 注意：如果值执行1,2操作的话，不会有任何结果。
+         * 注意：如果只执行1,2操作的话，不会有任何结果。
          * 验证出Steam操作是延迟的，只有进行了终止操作，才会执行中间操作！这就是所谓的延迟加载
          */
     }
@@ -84,7 +96,6 @@ public class LambdaTest {
 
     /**
      * Stream skip(Long n)
-     * 在丢掉流的第一个n元素后，返回由该流的n元素组成的流，如果此流包含少于n元素，那么将返回一个空流。
      * ---->跳过元素，返回一个扔掉了前n个元素的流。
      * 如果流中的元素不足n个，则返回一个空流，与limit(n)互补
      */
@@ -101,7 +112,7 @@ public class LambdaTest {
     /**
      * Stream distinct()
      * 注意：
-     * 自定义的类在去重的过程中必须重新hashCode和equals方法，因为distinct实现的时候底层去找这两个方法
+     * 自定义的类在去重的过程中必须重写hashCode和equals方法，因为distinct实现的时候底层去找这两个方法
      */
     @Test
     public void distinctTest(){
@@ -143,7 +154,7 @@ public class LambdaTest {
         // sorted(): 根据元素的自然顺序排序
         // sorted(Comparator<? super T> comparator): 根据比较器指定的规则排序
         Stream.of(33, 22, 11, 55)
-                .sorted()
+                //.sorted()
                 .sorted((o1, o2) -> o2 - o1)
                 .forEach(System.out::println);
         //这段代码中，sorted方法根据元素的自然顺序排序，也可以指定比较器排序。
@@ -160,6 +171,9 @@ public class LambdaTest {
      */
     @Test
     public void findTest(){
+        List<Student> list = initData();
+        System.out.println(list.stream().findFirst());
+        System.out.println(list.stream().filter(s->s.getAge()>55).findAny());
         Optional<Integer> first = Stream.of(5, 3, 6, 1).findFirst();
         System.out.println("first = " + first.get());
 
@@ -207,6 +221,7 @@ public class LambdaTest {
         List<String> strList = new ArrayList<>();
         Collections.addAll(strList, "张无忌", "周芷若", "赵敏", "小昭", "杨不悔");
         System.out.println(strList.stream().count());
+        strList.stream().close();
     }
 
     /**
@@ -215,14 +230,10 @@ public class LambdaTest {
      */
     @Test
     public void groupTest(){
-        Stream<Student> studentStream = Stream.of(
-                new Student("赵丽颖", 52, 95),
-                new Student("杨颖", 56, 88),
-                new Student("迪丽热巴", 56, 55),
-                new Student("柳岩", 52, 33));
+        List<Student> list = initData();
         // Map<Integer, List<Student>> map = studentStream.collect(Collectors.groupingBy(Student::getAge));
         // 将分数大于60的分为一组,小于60分成另一组
-        Map<String, List<Student>> map = studentStream.collect(Collectors.groupingBy((s) -> {
+        Map<String, List<Student>> map = list.stream().collect(Collectors.groupingBy((s) -> {
             if (s.getScore() > 60) {
                 return "及格";
             } else {
@@ -240,14 +251,10 @@ public class LambdaTest {
      */
     @Test
     public void joiningTest(){
-        Stream<Student> studentStream = Stream.of(
-                new Student("赵丽颖", 52, 95),
-                new Student("杨颖", 56, 88),
-                new Student("迪丽热巴", 56, 99),
-                new Student("柳岩", 52, 77));
-        String collect = studentStream
+        List<Student> list = initData();
+        String collect = list.stream()
                 .map(Student::getName)
-                .collect(Collectors.joining(">_<", "^_^", "^v^"));
+                .collect(Collectors.joining(",", "[", "]"));
         System.out.println(collect);
     }
 
@@ -292,6 +299,90 @@ public class LambdaTest {
         Map<Integer,UserTask> taskMap = userList.stream().collect(Collectors.toMap(UserTask::getId, entity -> entity));
         System.out.println(collect1.toString());
         System.out.println(taskMap.toString());
+    }
+
+    /**
+     * 遍历集合
+     */
+    @Test
+    public void forEachTest(){
+        List<Student> list = initData();
+        //方式一
+        list.forEach(s-> System.out.println(s.getName()));
+        //方式二
+        list.forEach(System.out::print);
+
+        System.out.println("=======================================================");
+        //使用匿名内部类
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("使用匿名内部类");
+            }
+        }).start();
+
+        new Thread(() -> System.out.println("Hello world !")).start();
+
+        //使用匿名内部类
+        Runnable race1 = new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("Hello world !");
+            }
+        };
+
+        Runnable race2 = () -> System.out.println("使用匿名内部类!");
+
+        race1.run();
+        race2.run();
+    }
+
+    /**
+     *collect，收集，可以说是内容最繁多、功能最丰富的部分了。从字面上去理解，就是把一个流收集起来，最终可以是收集成一个值也可以收集成一个新的集合。
+     */
+    @Test
+    public void collectTest(){
+        List<Student> list = initData();
+        Student s = list.stream().sorted((s1, s2) -> s1.getAge().compareTo(s2.getAge()))
+                .limit(5)
+                .distinct()
+                .max((s1,s2)->(s1.getScore()-s2.getScore()))
+                .get();
+                //.collect(Collectors.toList());
+        System.out.println(s);
+
+        List<Student> students = list.stream().sorted((s1, s2) -> s1.getAge().compareTo(s2.getAge()))
+                .limit(5)
+                .distinct()
+                .collect(Collectors.toList());
+        System.out.println(students);
+    }
+
+    /**
+     * 归约(reduce)
+     * 归约，也称缩减，顾名思义，是把一个流缩减成一个值，能实现对集合求和、求乘积和求最值操作。
+     */
+    @Test
+    public void reduceTest(){
+        List<Integer> list = Arrays.asList(1, 3, 2, 8, 11, 4);
+        // 求和方式1
+        Optional<Integer> sum = list.stream().reduce((x, y) -> x + y);
+        // 求和方式2
+        Optional<Integer> sum2 = list.stream().reduce(Integer::sum);
+        // 求和方式3
+        Integer sum3 = list.stream().reduce(0, Integer::sum);
+
+        // 求乘积
+        Optional<Integer> product = list.stream().reduce((x, y) -> x * y);
+
+        // 求最大值方式1
+        Optional<Integer> max = list.stream().reduce((x, y) -> x > y ? x : y);
+        // 求最大值写法2
+        Integer max2 = list.stream().reduce(1, Integer::max);
+
+        System.out.println("list求和：" + sum.get() + "," + sum2.get() + "," + sum3);
+        System.out.println("list求积：" + product.get());
+        System.out.println("list求和：" + max.get() + "," + max2);
     }
 
 }
@@ -341,6 +432,21 @@ class Student {
                 ", age=" + age +
                 ", score=" + score +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Student)) return false;
+        Student student = (Student) o;
+        return Objects.equals(name, student.name) &&
+                Objects.equals(age, student.age) &&
+                Objects.equals(score, student.score);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, age, score);
     }
 }
 class UserTask{

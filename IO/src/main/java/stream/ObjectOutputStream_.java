@@ -14,7 +14,5 @@ public class ObjectOutputStream_ {
         oos.writeInt(100);
         oos.writeByte(3);
         oos.close();
-
-
     }
 }

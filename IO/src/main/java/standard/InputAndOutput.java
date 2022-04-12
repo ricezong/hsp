@@ -12,7 +12,7 @@ public class InputAndOutput {
 
         //System类的public static final InputStream in = null;
         //System.in 编译类型    InputStream
-        //System.in 编译类型    BufferedInputStream
+        //System.in 运行类型    BufferedInputStream
         Scanner sc=new Scanner(System.in);
         System.out.println(System.in.getClass());
         //public static final PrintStream out = null;
