@@ -9,14 +9,18 @@ import java.io.IOException;
  */
 public class BufferedReader_ {
     public static void main(String[] args) {
-        String filePath = "E:\\WorkSpace\\IdeaProjects\\hsp\\IO\\src\\main\\resources\\file\\new1.txt";
+        String filePath = "E:\\WorkSpace\\IdeaProjects\\hsp\\IO\\src\\main\\resources\\file\\Reference.txt";
         BufferedReader bufferedReader=null;
         String line;
         try {
             bufferedReader=new BufferedReader(new FileReader(filePath));
             //按行读取 当返回为空时文件读取结束
             while ((line=bufferedReader.readLine())!=null){
-                System.out.println(line);
+                String[] split = line.split("\t");
+                for (int i = 0; i <split.length ; i++) {
+                    System.out.print(split[i]);
+                }
+                System.out.println();
             }
         } catch (IOException e) {
             e.printStackTrace();

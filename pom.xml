@@ -14,6 +14,8 @@
         <module>Lambda</module>
         <module>Enum</module>
         <module>Enum</module>
+        <module>Zip</module>
+        <module>Thread</module>
     </modules>
 
 

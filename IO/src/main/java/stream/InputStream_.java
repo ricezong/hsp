@@ -28,7 +28,7 @@ public class InputStream_ {
          * 演示使用read()读取文件
          */
         public void readFile01(){
-            String filePath="E:\\WorkSpace\\IdeaProjects\\hsp\\IO\\src\\main\\resources\\file\\new1.txt";
+            String filePath="E:\\WorkSpace\\IdeaProjects\\hsp\\IO\\src\\main\\resources\\file\\Reference.txt";
             FileInputStream fileInputStream=null;
             int readData=0;
             try {
@@ -56,11 +56,11 @@ public class InputStream_ {
          * 演示使用read(byte[] b)读取文件
          */
         public void readFile02(){
-            String filePath="E:\\WorkSpace\\IdeaProjects\\hsp\\IO\\src\\main\\resources\\file\\new1.txt";
+            String filePath="E:\\WorkSpace\\IdeaProjects\\hsp\\IO\\src\\main\\resources\\file\\Reference.txt";
             FileInputStream fileInputStream=null;
             int readLen=0;
             //一次读取8个字节
-            byte[] bytes=new byte[8];
+            byte[] bytes=new byte[22];
             try {
                 //创建FileInputStream对象用于读取文件
                 fileInputStream=new FileInputStream(filePath);
